@@ -1,17 +1,20 @@
 name: Run Python Scripts Daily
 
 on:
+  workflow_dispatch:       # allows manual run
   schedule:
-    - cron: '30 2 * * *'   # runs daily at 8 AM IST (2:30 UTC)
-  workflow_dispatch:        # allows manual trigger
+    - cron: '30 2 * * *'    # runs at 8 AM IST every day
 
 jobs:
   run-python:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Show folder contents (debug)
+        run: ls -la
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -23,7 +26,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run script1
+      - name: Run script1.py
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_USER: ${{ secrets.DB_USER }}
@@ -31,7 +34,7 @@ jobs:
           DB_NAME: ${{ secrets.DB_NAME }}
         run: python script1.py
 
-      - name: Run script2
+      - name: Run script2.py
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_USER: ${{ secrets.DB_USER }}
@@ -39,10 +42,11 @@ jobs:
           DB_NAME: ${{ secrets.DB_NAME }}
         run: python script2.py
 
-      - name: Run script3
+      - name: Run script3.py
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASS: ${{ secrets.DB_PASS }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: python script3.py
+
