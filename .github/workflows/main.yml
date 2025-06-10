@@ -1,36 +1,56 @@
-name: Run Python Scripts Daily
+name: Run Python Scripts
 
 on:
-  workflow_dispatch:        # 👈 Enables manual trigger
   schedule:
-    - cron: '30 2 * * *'     # 👈 Runs daily at 8 AM IST
+    - cron: '30 2 * * *'  # Runs daily at 2:30 AM UTC (8 AM IST)
+  workflow_dispatch:      # Allows manual triggering
 
 jobs:
-  run-python:
+  run-scripts:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Show file structure (for debugging)
-        run: ls -la
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run script1
-        run: python script1.py
+      - name: Get GitHub Actions IP ranges
+        run: |
+          echo "Fetching GitHub Actions IP ranges"
+          curl -s https://api.github.com/meta | grep -A 10 '"actions":'
 
-      - name: Run script2
-        run: python script2.py
+      - name: Check if scripts exist
+        run: |
+          ls -la
+          if [ ! -f script1.py ]; then echo "script1.py not found"; exit 1; fi
+          if [ ! -f script2.py ]; then echo "script2.py not found"; exit 1; fi
+          if [ ! -f script3.py ]; then echo "script3.py not found"; exit 1; fi
 
-      - name: Run script3
-        run: python script3.py
+      - name: Debug network connectivity
+        run: |
+          echo "Testing connectivity to $DB_HOST:3306"
+          nc -zv $DB_HOST 3306 || echo "Cannot connect to $DB_HOST:3306"
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+
+      - name: Run Python scripts
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        run: |
+          echo "Running script1.py"
+          python script1.py
+          echo "Running script2.py"
+          python script2.py
+          echo "Running script3.py"
+          python script3.py
