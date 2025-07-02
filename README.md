@@ -105,6 +105,9 @@ This pipeline handles it all:
 
 Track it all via the workflow logs in the Actions tab.
 
+![image](https://github.com/user-attachments/assets/e82c1934-0d18-416b-a6e6-63ace8487cf0)
+
+
 ---
 
 ## 📌 Quick Links
